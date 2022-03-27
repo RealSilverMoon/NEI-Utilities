@@ -1,0 +1,110 @@
+buildscript {
+	repositories {
+		mavenCentral()
+        maven {
+            name = "github"
+            url = "https://github.com/juanmuscaria/maven/raw/master"
+        }
+		maven {
+			name 'forge'
+			url 'https://maven.minecraftforge.net'
+		}
+		maven {
+			name 'sonatype'
+			url 'https://oss.sonatype.org/content/repositories/snapshots/'
+		}
+		maven {
+			name 'jitpack'
+			url 'https://jitpack.io'
+		}
+	}
+	dependencies {
+//		classpath 'net.minecraftforge.gradle:ForgeGradle:[1.2-1.4.6-SNAPSHOT,)'
+		classpath 'com.github.GTNewHorizons:ForgeGradle:1.2.7'
+	}
+}
+
+apply plugin: 'java'
+apply plugin: 'forge'
+
+[compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
+sourceCompatibility = targetCompatibility = compileJava.sourceCompatibility = compileJava.targetCompatibility = '1.8'
+
+version = mod_version
+group = mod_group
+archivesBaseName = mod_archives_name
+
+minecraft {
+	version = "1.7.10-10.13.4.1614-1.7.10"
+	runDir = "run"
+	replace "@VERSION@", project.version
+}
+
+repositories {
+	maven {
+		name "GTNH Maven"
+		url "http://jenkins.usrv.eu:8081/nexus/content/groups/public/"
+	}
+	maven {
+		name "Curse Maven"
+		url "https://cursemaven.com"
+	}
+	maven {
+		name "OvermindDL1 Maven"
+		url "http://gregtech.overminddl1.com/"
+	}
+	maven {
+		name "Jitpack"
+		url "https://jitpack.io"
+	}
+}
+
+dependencies {
+
+	compile ("com.github.GTNewHorizons:CodeChickenLib:1.1.5.1:dev")
+	compile ("com.github.GTNewHorizons:CodeChickenCore:1.1.3:dev")
+	compile ("com.github.GTNewHorizons:NotEnoughItems:2.2.10-GTNH:dev")
+
+}
+
+processResources {
+
+    from(sourceSets.main.resources.srcDirs) {
+        include 'mcmod.info'
+        expand 'version': project.version,
+		'mod_id': mod_id,
+		'mod_name': mod_name,
+		'mod_author': mod_author,
+		'mod_description': mod_description,
+		'mc_version': mc_version,
+		'mod_version': mod_version,
+		'mod_icon': mod_icon
+    }
+
+    from(sourceSets.main.resources.srcDirs) {
+        exclude 'mcmod.info'
+    }
+}
+
+runClient{
+	args("--username","developer")
+}
+
+task devJar(type: Jar) {
+	classifier = 'dev'
+	from sourceSets.main.output
+}
+
+task sourcesJar(type: Jar) {
+	classifier = 'sources'
+	from sourceSets.main.allSource
+}
+
+jar {
+	appendix project.minecraft.version
+}
+
+artifacts {
+	archives devJar
+	archives sourcesJar
+}
