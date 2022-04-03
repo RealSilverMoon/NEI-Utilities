@@ -27,6 +27,8 @@ public class AdvancedItemPanel extends ItemPanel implements ICraftingHandler, IU
 
     public static final AdvancedItemPanel INSTANCE = new AdvancedItemPanel();
 
+    public boolean isMouseOverHistory = false;
+
     public AdvancedItemPanel() {
         this.grid = new AdvancedItemPanelGrid();
     }
@@ -170,7 +172,9 @@ public class AdvancedItemPanel extends ItemPanel implements ICraftingHandler, IU
 
     @Override
     public boolean handleClick(int mouseX, int mouseY, int button) {
-        return super.handleClick(mouseX, mouseY, button);
+        boolean result = super.handleClick(mouseX, mouseY, button);
+        this.isMouseOverHistory = this.getAdvancedGrid().getHistoryRect().contains(mouseX, mouseY);
+        return result;
     }
 
     /**
@@ -195,15 +199,48 @@ public class AdvancedItemPanel extends ItemPanel implements ICraftingHandler, IU
                 mouseDownSlot = -1;
                 return;
             }
-            if (this.getAdvancedGrid().getHistoryRect().contains(mouseX, mouseY)) {
-                NEIClientUtils.cheatItem(this.getAdvancedGrid().getHistoryItem(hoverSlot.slotIndex), button, -1);
-            } else {
-                NEIClientUtils.cheatItem(getDraggedStackWithQuantity(hoverSlot.slotIndex), button, -1);
-            }
+            boolean isOverHistory = this.getAdvancedGrid().getHistoryRect().contains(mouseX, mouseY);
+            NEIClientUtils.cheatItem(getDraggedStackWithQuantity(isOverHistory, hoverSlot.slotIndex), button, -1);
         }
 
         mouseDownSlot = -1;
 
+    }
+
+    @Override
+    public void mouseDragged(int mouseX, int mouseY, int button, long heldTime) {
+        if (mouseDownSlot >= 0 && draggedStack == null && NEIClientUtils.getHeldItem() == null &&
+                NEIClientConfig.hasSMPCounterPart() && !GuiInfo.hasCustomSlots(NEIClientUtils.getGuiContainer())) {
+            ItemPanelSlot mouseOverSlot = getSlotMouseOver(mouseX, mouseY);
+
+            if (mouseOverSlot == null || mouseOverSlot.slotIndex != mouseDownSlot || heldTime > 500) {
+                draggedStack = this.getDraggedStackWithQuantity(isMouseOverHistory, mouseDownSlot);
+                mouseDownSlot = -1;
+                isMouseOverHistory = false;
+            }
+
+        }
+    }
+
+    /**
+     * In fact, this method is specifically designed for {@link AdvancedItemPanel#mouseDragged(int, int, int, long)},
+     * because it is not credible to determine whether the mouse
+     * is over the history area in {@link AdvancedItemPanel#getDraggedStackWithQuantity(int)}
+     */
+    public ItemStack getDraggedStackWithQuantity(boolean isHistory, int mouseDownSlot) {
+        ItemStack stack = isHistory ? this.getAdvancedGrid().getHistoryItem(mouseDownSlot) : grid.getItem(mouseDownSlot);
+
+        if (stack != null) {
+            int amount = NEIClientConfig.getItemQuantity();
+
+            if (amount == 0) {
+                amount = stack.getMaxStackSize();
+            }
+
+            return NEIServerUtils.copyStack(stack, amount);
+        }
+
+        return null;
     }
 
     @Override
