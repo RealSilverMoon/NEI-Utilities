@@ -54,10 +54,17 @@ public class AdvancedItemPanel extends ItemPanel implements ICraftingHandler, IU
         }
 
         public Rectangle4i getHistoryRect() {
-            Rectangle4i rect = getSlotRect(startIndex);
-            rect.w = rect.w * this.columns;
-            rect.h = rect.h * USE_ROWS;
-            return rect;
+            
+            if (columns > 0 && rows > 0) {
+                Rectangle4i rect = getSlotRect(startIndex);
+                rect.w = rect.w * this.columns;
+                rect.h = rect.h * USE_ROWS;
+                return rect;
+            } else {
+                //Some guis are too big so there is no place to display the history
+                return new Rectangle4i(0, 0, 0, 0);
+            }
+
         }
 
         @Override

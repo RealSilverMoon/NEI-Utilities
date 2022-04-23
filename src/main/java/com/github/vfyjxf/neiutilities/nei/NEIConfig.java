@@ -1,7 +1,6 @@
 package com.github.vfyjxf.neiutilities.nei;
 
 import codechicken.nei.ItemPanels;
-import codechicken.nei.LayoutManager;
 import codechicken.nei.api.API;
 import codechicken.nei.api.IConfigureNEI;
 import codechicken.nei.guihook.GuiContainerManager;
