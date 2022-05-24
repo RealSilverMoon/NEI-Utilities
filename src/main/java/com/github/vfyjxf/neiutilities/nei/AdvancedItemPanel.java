@@ -20,10 +20,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static codechicken.lib.gui.GuiDraw.getMousePosition;
+import static com.github.vfyjxf.neiutilities.config.NeiUtilitiesConfig.useRows;
 
 public class AdvancedItemPanel extends ItemPanel implements ICraftingHandler, IUsageHandler, IContainerInputHandler {
-
-    public static final int USE_ROWS = 2;
 
     public static final AdvancedItemPanel INSTANCE = new AdvancedItemPanel();
 
@@ -54,11 +53,11 @@ public class AdvancedItemPanel extends ItemPanel implements ICraftingHandler, IU
         }
 
         public Rectangle4i getHistoryRect() {
-            
+
             if (columns > 0 && rows > 0) {
                 Rectangle4i rect = getSlotRect(startIndex);
                 rect.w = rect.w * this.columns;
-                rect.h = rect.h * USE_ROWS;
+                rect.h = rect.h * useRows;
                 return rect;
             } else {
                 //Some guis are too big so there is no place to display the history
@@ -69,14 +68,8 @@ public class AdvancedItemPanel extends ItemPanel implements ICraftingHandler, IU
 
         @Override
         public void setGridSize(int mLeft, int mTop, int w, int h) {
-            marginLeft = mLeft;
-            marginTop = mTop;
-
-            width = Math.max(0, w);
-            height = Math.max(0, h);
-
-            columns = width / SLOT_SIZE;
-            this.rows = height / SLOT_SIZE - USE_ROWS;
+            super.setGridSize(mLeft, mTop, w, h);
+            rows = (height / SLOT_SIZE) - useRows;
             this.startIndex = this.columns * this.rows;
         }
 
@@ -104,7 +97,7 @@ public class AdvancedItemPanel extends ItemPanel implements ICraftingHandler, IU
                     return idx < size() ? new ItemPanelSlot(idx, realItems.get(idx)) : null;
                 }
 
-                if (overRow <= rows + USE_ROWS) {
+                if (overRow <= rows + useRows) {
                     for (int i = 0; i < validSlotMap.length && i < historyItems.size(); i++) {
                         if (validSlotMap[i]) {
                             if (getSlotRect(startIndex + i).contains(mouseX, mouseY)) {
@@ -131,14 +124,14 @@ public class AdvancedItemPanel extends ItemPanel implements ICraftingHandler, IU
                 is.stackSize = 1;
                 historyItems.removeIf(stack -> stack.isItemEqual(is));
                 historyItems.add(0, is);
-                if (historyItems.size() > (USE_ROWS * columns)) {
-                    historyItems.remove((USE_ROWS * columns) - 1);
+                if (historyItems.size() > (useRows * columns)) {
+                    historyItems.remove((useRows * columns) - 1);
                 }
             }
         }
 
         public void updateValidSlots() {
-            this.validSlotMap = new boolean[this.columns * USE_ROWS];
+            this.validSlotMap = new boolean[this.columns * useRows];
             for (int i = 0; i < validSlotMap.length; i++) {
                 if (slotValid(NEIClientUtils.getGuiContainer(), i)) {
                     this.validSlotMap[i] = true;
@@ -162,7 +155,7 @@ public class AdvancedItemPanel extends ItemPanel implements ICraftingHandler, IU
             GuiContainerManager.enableMatrixStackLogging();
             //draw history highlighted area
             Rectangle4i firstRect = getSlotRect(this.startIndex);
-            GuiDraw.drawRect(firstRect.x, firstRect.y, this.columns * firstRect.w, USE_ROWS * firstRect.h, NeiUtilitiesConfig.historyColor);
+            GuiDraw.drawRect(firstRect.x, firstRect.y+3, this.columns * firstRect.w, 3, NeiUtilitiesConfig.historyColor);
             for (int i = 0; i < this.validSlotMap.length && i < historyItems.size(); i++) {
                 if (validSlotMap[i]) {
                     Rectangle4i rect = getSlotRect(startIndex + i);
@@ -175,6 +168,11 @@ public class AdvancedItemPanel extends ItemPanel implements ICraftingHandler, IU
             }
             GuiContainerManager.disableMatrixStackLogging();
         }
+
+        private void drawSplittingArea(){
+
+        }
+
     }
 
     @Override

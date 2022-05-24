@@ -5,6 +5,8 @@ import codechicken.nei.api.API;
 import codechicken.nei.api.IConfigureNEI;
 import codechicken.nei.guihook.GuiContainerManager;
 import com.github.vfyjxf.neiutilities.NEIUtilities;
+import com.github.vfyjxf.neiutilities.gui.ItemInfoHelper;
+import org.lwjgl.input.Keyboard;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
@@ -13,9 +15,16 @@ public class NEIConfig implements IConfigureNEI {
 
     @Override
     public void loadConfig() {
-        API.registerUsageHandler(AdvancedItemPanel.INSTANCE);
-        API.registerRecipeHandler(AdvancedItemPanel.INSTANCE);
-        GuiContainerManager.addInputHandler(AdvancedItemPanel.INSTANCE);
+        {
+            API.registerUsageHandler(AdvancedItemPanel.INSTANCE);
+            API.registerRecipeHandler(AdvancedItemPanel.INSTANCE);
+            GuiContainerManager.addInputHandler(AdvancedItemPanel.INSTANCE);
+        }
+        {
+            GuiContainerManager.addInputHandler(new ItemInfoHelper());
+            API.addKeyBind("neiutilities.utils.copy_name", Keyboard.KEY_C);
+            API.addKeyBind("neiutilities.utils.copy_oredict", Keyboard.KEY_D);
+        }
     }
 
     public static void setItemPanel() {

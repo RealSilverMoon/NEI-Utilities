@@ -1,0 +1,4 @@
+nei.options.keys.neiutilities=NEI Utilities
+nei.options.keys.neiutilities.utils=Utils
+nei.options.keys.neiutilities.utils.copy_name=Copy Item Name
+nei.options.keys.neiutilities.utils.copy_oredict=Copy Item OreDictionary
