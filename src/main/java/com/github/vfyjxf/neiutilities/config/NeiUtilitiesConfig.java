@@ -28,9 +28,9 @@ public class NeiUtilitiesConfig {
                 splittingMode = SplittingMode.valueOf(
                         config.getString("splittingMode",
                                 CATEGORY_HISTORY,
-                                SplittingMode.LINE.name(),
+                                SplittingMode.DOTTED_LINE.name(),
                                 "Splitting mode for the browsing history.\n" +
-                                        "Mode : BACKGROUND,DOTTED_LINE,LINE"
+                                        "Mode : BACKGROUND,DOTTED_LINE"
                         )
                 );
             } catch (IllegalArgumentException | NullPointerException e) {
@@ -43,4 +43,7 @@ public class NeiUtilitiesConfig {
         }
     }
 
+    public static SplittingMode getSplittingMode() {
+        return splittingMode;
+    }
 }

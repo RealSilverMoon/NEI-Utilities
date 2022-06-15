@@ -6,12 +6,16 @@ import codechicken.nei.api.IConfigureNEI;
 import codechicken.nei.guihook.GuiContainerManager;
 import com.github.vfyjxf.neiutilities.NEIUtilities;
 import com.github.vfyjxf.neiutilities.gui.ItemInfoHelper;
+import com.github.vfyjxf.neiutilities.gui.RecipeInfoRender;
 import org.lwjgl.input.Keyboard;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 
 public class NEIConfig implements IConfigureNEI {
+
+    public static final String COPY_NAME_KEY = "neiutilities.utils.copy_name";
+    public static final String COPY_OREDICT_KEY = "neiutilities.utils.copy_oredict";
 
     @Override
     public void loadConfig() {
@@ -22,8 +26,8 @@ public class NEIConfig implements IConfigureNEI {
         }
         {
             GuiContainerManager.addInputHandler(new ItemInfoHelper());
-            API.addKeyBind("neiutilities.utils.copy_name", Keyboard.KEY_C);
-            API.addKeyBind("neiutilities.utils.copy_oredict", Keyboard.KEY_D);
+            API.addKeyBind(COPY_NAME_KEY, Keyboard.KEY_C);
+            API.addKeyBind(COPY_OREDICT_KEY, Keyboard.KEY_D);
         }
     }
 

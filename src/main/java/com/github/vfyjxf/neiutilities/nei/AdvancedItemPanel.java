@@ -11,9 +11,11 @@ import codechicken.nei.guihook.GuiContainerManager;
 import codechicken.nei.guihook.IContainerInputHandler;
 import codechicken.nei.recipe.*;
 import com.github.vfyjxf.neiutilities.config.NeiUtilitiesConfig;
+import com.github.vfyjxf.neiutilities.config.SplittingMode;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.inventory.Container;
 import net.minecraft.item.ItemStack;
+import org.lwjgl.opengl.GL11;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -155,7 +157,11 @@ public class AdvancedItemPanel extends ItemPanel implements ICraftingHandler, IU
             GuiContainerManager.enableMatrixStackLogging();
             //draw history highlighted area
             Rectangle4i firstRect = getSlotRect(this.startIndex);
-            GuiDraw.drawRect(firstRect.x, firstRect.y+3, this.columns * firstRect.w, 3, NeiUtilitiesConfig.historyColor);
+            if (NeiUtilitiesConfig.getSplittingMode() == SplittingMode.BACKGROUND) {
+                GuiDraw.drawRect(firstRect.x, firstRect.y, this.columns * firstRect.w, useRows * firstRect.h, NeiUtilitiesConfig.historyColor);
+            } else {
+                drawSplittingArea(firstRect.x, firstRect.y, this.columns * firstRect.w, useRows * firstRect.h, NeiUtilitiesConfig.historyColor);
+            }
             for (int i = 0; i < this.validSlotMap.length && i < historyItems.size(); i++) {
                 if (validSlotMap[i]) {
                     Rectangle4i rect = getSlotRect(startIndex + i);
@@ -169,7 +175,41 @@ public class AdvancedItemPanel extends ItemPanel implements ICraftingHandler, IU
             GuiContainerManager.disableMatrixStackLogging();
         }
 
-        private void drawSplittingArea(){
+        private void drawSplittingArea(int x, int y, int width, int height, int color) {
+
+
+            float alpha = (float) (color >> 24 & 255) / 255.0F;
+            float red = (float) (color >> 16 & 255) / 255.0F;
+            float green = (float) (color >> 8 & 255) / 255.0F;
+            float blue = (float) (color & 255) / 255.0F;
+
+            int maxX = x + width;
+            int maxY = y + height;
+
+            GL11.glPushMatrix();
+
+            GL11.glDisable(GL11.GL_TEXTURE_2D);
+            GL11.glEnable(GL11.GL_LINE_STIPPLE);
+            GL11.glColor4f(red,green,blue,alpha);
+            GL11.glLineWidth(2F);
+            GL11.glLineStipple(2, (short) 0x00FF);
+
+            GL11.glBegin(GL11.GL_LINE_LOOP);
+
+            GL11.glVertex2i(x, y);
+            GL11.glVertex2i(x + width, y);
+            GL11.glVertex2i(x + width, y + height);
+            GL11.glVertex2i(x, y + height);
+
+            GL11.glEnd();
+
+            GL11.glLineStipple(1, (short)0xFFFF);
+            GL11.glLineWidth(1F);
+            GL11.glDisable(GL11.GL_LINE_STIPPLE);
+            GL11.glEnable(GL11.GL_TEXTURE_2D);
+            GL11.glColor4f(1F, 1F, 1F, 1F);
+
+            GL11.glPopMatrix();
 
         }
 

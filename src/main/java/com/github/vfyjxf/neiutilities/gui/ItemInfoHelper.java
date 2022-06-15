@@ -2,6 +2,7 @@ package com.github.vfyjxf.neiutilities.gui;
 
 import codechicken.nei.guihook.GuiContainerManager;
 import codechicken.nei.guihook.IContainerInputHandler;
+import com.github.vfyjxf.neiutilities.nei.NEIConfig;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.oredict.OreDictionary;
@@ -15,11 +16,11 @@ public class ItemInfoHelper implements IContainerInputHandler {
 
     @Override
     public boolean lastKeyTyped(GuiContainer gui, char keyChar, int keyId) {
-        if (keyId == getKeyBinding("neiutilities.utils.copy.name") || keyId == getKeyBinding("neiutilities.utils.copy.oredict")) {
+        if (keyId == getKeyBinding(NEIConfig.COPY_NAME_KEY) || keyId == getKeyBinding(NEIConfig.COPY_OREDICT_KEY)) {
             if (GuiContainer.isCtrlKeyDown()) {
                 ItemStack stackUnderMouse = GuiContainerManager.getStackMouseOver(gui);
                 if (stackUnderMouse != null) {
-                    if (keyId == getKeyBinding("neiutilities.utils.copy.name")) {
+                    if (keyId == getKeyBinding(NEIConfig.COPY_NAME_KEY)) {
                         Toolkit.getDefaultToolkit().getSystemClipboard().setContents(new StringSelection(stackUnderMouse.getDisplayName()), null);
                     } else {
                         StringBuilder builder = new StringBuilder();
