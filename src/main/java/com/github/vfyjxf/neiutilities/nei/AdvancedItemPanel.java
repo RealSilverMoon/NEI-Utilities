@@ -127,7 +127,7 @@ public class AdvancedItemPanel extends ItemPanel implements ICraftingHandler, IU
                 historyItems.removeIf(stack -> stack.isItemEqual(is));
                 historyItems.add(0, is);
                 if (historyItems.size() > (useRows * columns)) {
-                    historyItems.remove((useRows * columns) - 1);
+                    historyItems.remove(useRows * columns);
                 }
             }
         }
