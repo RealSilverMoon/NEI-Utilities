@@ -77,28 +77,10 @@ public class AdvancedItemPanel extends ItemPanel implements ICraftingHandler, IU
 
         @Override
         public ItemPanelSlot getSlotMouseOver(int mouseX, int mouseY) {
+            ItemPanelSlot result = super.getSlotMouseOver(mouseX, mouseY);
 
-            if (!contains(mouseX, mouseY)) {
-                return null;
-            }
-
-            final int overRow = (mouseY - marginTop) / SLOT_SIZE;
-            final int overColumn = (mouseX - marginLeft - (width % SLOT_SIZE) / 2) / SLOT_SIZE;
-
-            if (overColumn < columns) {
-                if (overRow < rows) {
-                    final int slt = columns * overRow + overColumn;
-                    int idx = page * perPage + slt;
-
-                    for (int i = 0; i < slt; i++) {
-                        if (invalidSlotMap[i]) {
-                            idx--;
-                        }
-                    }
-
-                    return idx < size() ? new ItemPanelSlot(idx, realItems.get(idx)) : null;
-                }
-
+            if (result == null) {
+                final int overRow = (mouseY - marginTop) / SLOT_SIZE;
                 if (overRow <= rows + useRows) {
                     for (int i = 0; i < validSlotMap.length && i < historyItems.size(); i++) {
                         if (validSlotMap[i]) {
@@ -108,10 +90,9 @@ public class AdvancedItemPanel extends ItemPanel implements ICraftingHandler, IU
                         }
                     }
                 }
-
             }
 
-            return null;
+            return result;
         }
 
         @Override
@@ -183,14 +164,11 @@ public class AdvancedItemPanel extends ItemPanel implements ICraftingHandler, IU
             float green = (float) (color >> 8 & 255) / 255.0F;
             float blue = (float) (color & 255) / 255.0F;
 
-            int maxX = x + width;
-            int maxY = y + height;
-
             GL11.glPushMatrix();
 
             GL11.glDisable(GL11.GL_TEXTURE_2D);
             GL11.glEnable(GL11.GL_LINE_STIPPLE);
-            GL11.glColor4f(red,green,blue,alpha);
+            GL11.glColor4f(red, green, blue, alpha);
             GL11.glLineWidth(2F);
             GL11.glLineStipple(2, (short) 0x00FF);
 
@@ -203,7 +181,7 @@ public class AdvancedItemPanel extends ItemPanel implements ICraftingHandler, IU
 
             GL11.glEnd();
 
-            GL11.glLineStipple(1, (short)0xFFFF);
+            GL11.glLineStipple(1, (short) 0xFFFF);
             GL11.glLineWidth(1F);
             GL11.glDisable(GL11.GL_LINE_STIPPLE);
             GL11.glEnable(GL11.GL_TEXTURE_2D);
@@ -426,12 +404,12 @@ public class AdvancedItemPanel extends ItemPanel implements ICraftingHandler, IU
     }
 
     @Override
-    public List<String> handleTooltip(GuiRecipe gui, List<String> currentTip, int recipe) {
+    public List<String> handleTooltip(GuiRecipe<?> gui, List<String> currenttip, int recipe) {
         return null;
     }
 
     @Override
-    public List<String> handleItemTooltip(GuiRecipe gui, ItemStack stack, List<String> currentTip, int recipe) {
+    public List<String> handleItemTooltip(GuiRecipe<?> gui, ItemStack stack, List<String> currenttip, int recipe) {
         return null;
     }
 

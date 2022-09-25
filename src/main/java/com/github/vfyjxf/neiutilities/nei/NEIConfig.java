@@ -6,7 +6,6 @@ import codechicken.nei.api.IConfigureNEI;
 import codechicken.nei.guihook.GuiContainerManager;
 import com.github.vfyjxf.neiutilities.NEIUtilities;
 import com.github.vfyjxf.neiutilities.gui.ItemInfoHelper;
-import com.github.vfyjxf.neiutilities.gui.RecipeInfoRender;
 import org.lwjgl.input.Keyboard;
 
 import java.lang.reflect.Field;
