@@ -200,36 +200,6 @@ public class AdvancedItemPanel extends ItemPanel implements ICraftingHandler, IU
         return result;
     }
 
-    /**
-     * We should not open the recipe in GuiRecipe because it has already been processed by RecipeItemInputHandler,
-     * this will cause the recipe to be opened twice and therefore the history item will not be added properly
-     */
-    @Override
-    public void mouseUp(int mouseX, int mouseY, int button) {
-
-        ItemPanelSlot hoverSlot = getSlotMouseOver(mouseX, mouseY);
-
-        if (hoverSlot != null && hoverSlot.slotIndex == mouseDownSlot && draggedStack == null) {
-            ItemStack item = hoverSlot.item;
-
-            if (!(NEIController.manager.window instanceof GuiRecipe) && !NEIClientConfig.canCheatItem(item)) {
-
-                if (button == 0)
-                    GuiCraftingRecipe.openRecipeGui("item", item);
-                else if (button == 1)
-                    GuiUsageRecipe.openRecipeGui("item", item);
-
-                mouseDownSlot = -1;
-                return;
-            }
-            boolean isOverHistory = this.getAdvancedGrid().getHistoryRect().contains(mouseX, mouseY);
-            NEIClientUtils.cheatItem(getDraggedStackWithQuantity(isOverHistory, hoverSlot.slotIndex), button, -1);
-        }
-
-        mouseDownSlot = -1;
-
-    }
-
     @Override
     public void mouseDragged(int mouseX, int mouseY, int button, long heldTime) {
         if (mouseDownSlot >= 0 && draggedStack == null && NEIClientUtils.getHeldItem() == null &&

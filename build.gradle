@@ -39,7 +39,7 @@ minecraft {
 repositories {
 	maven {
 		name "GTNH Maven"
-		url "http://jenkins.usrv.eu:8081/nexus/content/groups/public/"
+		url "https://jenkins.usrv.eu:8081/nexus/content/groups/public/"
 	}
 	maven {
 		name "Curse Maven"
@@ -47,7 +47,7 @@ repositories {
 	}
 	maven {
 		name "OvermindDL1 Maven"
-		url "http://gregtech.overminddl1.com/"
+		url "https://gregtech.overminddl1.com/"
 	}
 	maven {
 		name "Jitpack"
@@ -57,9 +57,9 @@ repositories {
 
 dependencies {
 
-	compile ("com.github.GTNewHorizons:CodeChickenLib:1.1.5.1:dev")
-	compile ("com.github.GTNewHorizons:CodeChickenCore:1.1.3:dev")
-	compile ("com.github.GTNewHorizons:NotEnoughItems:2.3.7-GTNH:dev")
+	compile('com.github.GTNewHorizons:CodeChickenLib:1.1.5.5:dev')
+	compile('com.github.GTNewHorizons:CodeChickenCore:1.1.6:dev')
+	compile ("com.github.GTNewHorizons:NotEnoughItems:2.3.14-GTNH:dev")
 
 }
 
