@@ -1,15 +1,18 @@
 package com.github.vfyjxf.neiutilities.nei;
 
+import java.lang.reflect.Field;
+
+import org.lwjgl.input.Keyboard;
+
+import com.github.vfyjxf.neiutilities.NEIUtilities;
+import com.github.vfyjxf.neiutilities.gui.ItemInfoHelper;
+
+import codechicken.nei.ItemPanel;
 import codechicken.nei.ItemPanels;
+import codechicken.nei.PanelWidget;
 import codechicken.nei.api.API;
 import codechicken.nei.api.IConfigureNEI;
 import codechicken.nei.guihook.GuiContainerManager;
-import com.github.vfyjxf.neiutilities.NEIUtilities;
-import com.github.vfyjxf.neiutilities.gui.ItemInfoHelper;
-import org.lwjgl.input.Keyboard;
-
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
 
 public class NEIConfig implements IConfigureNEI {
 
@@ -19,9 +22,9 @@ public class NEIConfig implements IConfigureNEI {
     @Override
     public void loadConfig() {
         {
-            API.registerUsageHandler(AdvancedItemPanel.INSTANCE);
-            API.registerRecipeHandler(AdvancedItemPanel.INSTANCE);
-            GuiContainerManager.addInputHandler(AdvancedItemPanel.INSTANCE);
+            API.registerUsageHandler(AdvancedItemPanel.GRID_INSTANCE);
+            API.registerRecipeHandler(AdvancedItemPanel.GRID_INSTANCE);
+            GuiContainerManager.addInputHandler(AdvancedItemPanel.GRID_INSTANCE);
         }
         {
             GuiContainerManager.addInputHandler(new ItemInfoHelper());
@@ -31,16 +34,14 @@ public class NEIConfig implements IConfigureNEI {
     }
 
     public static void setItemPanel() {
+        ItemPanel panel = ItemPanels.itemPanel;
         try {
-            Field itemPanel = ItemPanels.class.getDeclaredField("itemPanel");
-            Field modifiers = itemPanel.getClass().getDeclaredField("modifiers");
-            itemPanel.setAccessible(true);
-            modifiers.setAccessible(true);
-            modifiers.setInt(itemPanel, itemPanel.getModifiers() & ~Modifier.FINAL);
-            itemPanel.set(null, AdvancedItemPanel.INSTANCE);
-            modifiers.setInt(itemPanel, itemPanel.getModifiers() | Modifier.FINAL);
-        } catch (NoSuchFieldException | IllegalAccessException e) {
-            e.printStackTrace();
+            Field grid = PanelWidget.class.getDeclaredField("grid");
+            grid.setAccessible(true);
+            grid.set(panel, AdvancedItemPanel.GRID_INSTANCE);
+            grid.setAccessible(false);
+        } catch (NoSuchFieldException | IllegalAccessException e2) {
+            e2.printStackTrace();
         }
     }
 

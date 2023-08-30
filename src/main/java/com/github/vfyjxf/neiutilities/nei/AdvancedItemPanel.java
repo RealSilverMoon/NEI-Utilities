@@ -1,5 +1,21 @@
 package com.github.vfyjxf.neiutilities.nei;
 
+import static codechicken.lib.gui.GuiDraw.getMousePosition;
+import static com.github.vfyjxf.neiutilities.config.NeiUtilitiesConfig.useRows;
+
+import java.awt.*;
+import java.util.ArrayList;
+import java.util.List;
+
+import net.minecraft.client.gui.inventory.GuiContainer;
+import net.minecraft.inventory.Container;
+import net.minecraft.item.ItemStack;
+
+import org.lwjgl.opengl.GL11;
+
+import com.github.vfyjxf.neiutilities.config.NeiUtilitiesConfig;
+import com.github.vfyjxf.neiutilities.config.SplittingMode;
+
 import codechicken.lib.gui.GuiDraw;
 import codechicken.lib.vec.Rectangle4i;
 import codechicken.nei.*;
@@ -10,41 +26,25 @@ import codechicken.nei.api.IRecipeOverlayRenderer;
 import codechicken.nei.guihook.GuiContainerManager;
 import codechicken.nei.guihook.IContainerInputHandler;
 import codechicken.nei.recipe.*;
-import com.github.vfyjxf.neiutilities.config.NeiUtilitiesConfig;
-import com.github.vfyjxf.neiutilities.config.SplittingMode;
-import net.minecraft.client.gui.inventory.GuiContainer;
-import net.minecraft.inventory.Container;
-import net.minecraft.item.ItemStack;
-import org.lwjgl.opengl.GL11;
 
-import java.awt.*;
-import java.util.ArrayList;
-import java.util.List;
-
-import static codechicken.lib.gui.GuiDraw.getMousePosition;
-import static com.github.vfyjxf.neiutilities.config.NeiUtilitiesConfig.useRows;
-
-public class AdvancedItemPanel extends ItemPanel implements ICraftingHandler, IUsageHandler, IContainerInputHandler {
+public class AdvancedItemPanel extends ItemPanel {
 
     public static final AdvancedItemPanel INSTANCE = new AdvancedItemPanel();
+
+    public static final AdvancedItemPanelGrid GRID_INSTANCE = new AdvancedItemPanelGrid();
 
     public boolean isMouseOverHistory = false;
 
     public AdvancedItemPanel() {
-        this.grid = new AdvancedItemPanelGrid();
-    }
-
-    public void addHistoryItem(Object... results) {
-        if (results.length > 0 && results[0] instanceof ItemStack) {
-            this.getAdvancedGrid().addHistoryItem((ItemStack) results[0]);
-        }
+        this.grid = GRID_INSTANCE;
     }
 
     public AdvancedItemPanelGrid getAdvancedGrid() {
         return (AdvancedItemPanelGrid) this.grid;
     }
 
-    protected static class AdvancedItemPanelGrid extends ItemPanelGrid {
+    public static class AdvancedItemPanelGrid extends ItemPanelGrid
+        implements ICraftingHandler, IUsageHandler, IContainerInputHandler {
 
         private int startIndex;
         private final List<ItemStack> historyItems = new ArrayList<>();
@@ -62,7 +62,7 @@ public class AdvancedItemPanel extends ItemPanel implements ICraftingHandler, IU
                 rect.h = rect.h * useRows;
                 return rect;
             } else {
-                //Some guis are too big so there is no place to display the history
+                // Some guis are too big so there is no place to display the history
                 return new Rectangle4i(0, 0, 0, 0);
             }
 
@@ -136,19 +136,29 @@ public class AdvancedItemPanel extends ItemPanel implements ICraftingHandler, IU
         public void draw(int mouseX, int mouseY) {
             super.draw(mouseX, mouseY);
             GuiContainerManager.enableMatrixStackLogging();
-            //draw history highlighted area
+            // draw history highlighted area
             Rectangle4i firstRect = getSlotRect(this.startIndex);
             if (NeiUtilitiesConfig.getSplittingMode() == SplittingMode.BACKGROUND) {
-                GuiDraw.drawRect(firstRect.x, firstRect.y, this.columns * firstRect.w, useRows * firstRect.h, NeiUtilitiesConfig.historyColor);
+                GuiDraw.drawRect(
+                    firstRect.x,
+                    firstRect.y,
+                    this.columns * firstRect.w,
+                    useRows * firstRect.h,
+                    NeiUtilitiesConfig.historyColor);
             } else {
-                drawSplittingArea(firstRect.x, firstRect.y, this.columns * firstRect.w, useRows * firstRect.h, NeiUtilitiesConfig.historyColor);
+                drawSplittingArea(
+                    firstRect.x,
+                    firstRect.y,
+                    this.columns * firstRect.w,
+                    useRows * firstRect.h,
+                    NeiUtilitiesConfig.historyColor);
             }
             for (int i = 0; i < this.validSlotMap.length && i < historyItems.size(); i++) {
                 if (validSlotMap[i]) {
                     Rectangle4i rect = getSlotRect(startIndex + i);
                     ItemPanelSlot slot = getSlotMouseOver(mouseX, mouseY);
                     if (slot != null && slot.slotIndex == startIndex + i) {
-                        GuiDraw.drawRect(rect.x, rect.y, rect.w, rect.h, 0xee555555);//highlight
+                        GuiDraw.drawRect(rect.x, rect.y, rect.w, rect.h, 0xee555555);// highlight
                     }
                     GuiContainerManager.drawItem(rect.x + 1, rect.y + 1, historyItems.get(i));
                 }
@@ -157,7 +167,6 @@ public class AdvancedItemPanel extends ItemPanel implements ICraftingHandler, IU
         }
 
         private void drawSplittingArea(int x, int y, int width, int height, int color) {
-
 
             float alpha = (float) (color >> 24 & 255) / 255.0F;
             float red = (float) (color >> 16 & 255) / 255.0F;
@@ -191,19 +200,166 @@ public class AdvancedItemPanel extends ItemPanel implements ICraftingHandler, IU
 
         }
 
+        @Override
+        public boolean mouseClicked(GuiContainer gui, int mouseX, int mouseY, int button) {
+            return this.getHistoryRect()
+                .contains(mouseX, mouseY);
+        }
+
+        public void addHistoryItem(Object... results) {
+            if (results.length > 0 && results[0] instanceof ItemStack) {
+                this.addHistoryItem((ItemStack) results[0]);
+            }
+        }
+
+        @Override
+        public ICraftingHandler getRecipeHandler(String outputId, Object... results) {
+            this.addHistoryItem(results);
+            return this;
+        }
+
+        @Override
+        public IUsageHandler getUsageHandler(String inputId, Object... ingredients) {
+            this.addHistoryItem(ingredients);
+            return this;
+        }
+
+        @Override
+        public boolean keyTyped(GuiContainer gui, char keyChar, int keyCode) {
+            return false;
+        }
+
+        @Override
+        public void onKeyTyped(GuiContainer gui, char keyChar, int keyID) {
+
+        }
+
+        @Override
+        public boolean lastKeyTyped(GuiContainer gui, char keyChar, int keyID) {
+            return false;
+        }
+
+        @Override
+        public void onMouseClicked(GuiContainer gui, int mouseX, int mouseY, int button) {
+
+        }
+
+        @Override
+        public void onMouseUp(GuiContainer gui, int mouseX, int mouseY, int button) {
+
+        }
+
+        @Override
+        public boolean mouseScrolled(GuiContainer gui, int mouseX, int mouseY, int scrolled) {
+            return false;
+        }
+
+        @Override
+        public void onMouseScrolled(GuiContainer gui, int mouseX, int mouseY, int scrolled) {
+
+        }
+
+        @Override
+        public void onMouseDragged(GuiContainer gui, int mouseX, int mouseY, int button, long heldTime) {
+
+        }
+
+        @Override
+        public String getRecipeName() {
+            return null;
+        }
+
+        @Override
+        public int numRecipes() {
+            return 0;
+        }
+
+        @Override
+        public void drawBackground(int recipe) {
+
+        }
+
+        @Override
+        public void drawForeground(int recipe) {
+
+        }
+
+        @Override
+        public List<PositionedStack> getIngredientStacks(int recipe) {
+            return null;
+        }
+
+        @Override
+        public List<PositionedStack> getOtherStacks(int recipeType) {
+            return null;
+        }
+
+        @Override
+        public PositionedStack getResultStack(int recipe) {
+            return null;
+        }
+
+        @Override
+        public void onUpdate() {
+
+        }
+
+        @Override
+        public boolean hasOverlay(GuiContainer gui, Container container, int recipe) {
+            return false;
+        }
+
+        @Override
+        public IRecipeOverlayRenderer getOverlayRenderer(GuiContainer gui, int recipe) {
+            return null;
+        }
+
+        @Override
+        public IOverlayHandler getOverlayHandler(GuiContainer gui, int recipe) {
+            return null;
+        }
+
+        @Override
+        public int recipiesPerPage() {
+            return 0;
+        }
+
+        @Override
+        public List<String> handleTooltip(GuiRecipe<?> gui, List<String> currenttip, int recipe) {
+            return null;
+        }
+
+        @Override
+        public List<String> handleItemTooltip(GuiRecipe<?> gui, ItemStack stack, List<String> currenttip, int recipe) {
+            return null;
+        }
+
+        @Override
+        public boolean keyTyped(GuiRecipe gui, char keyChar, int keyCode, int recipe) {
+            return false;
+        }
+
+        @Override
+        public boolean mouseClicked(GuiRecipe gui, int button, int recipe) {
+            return true;
+        }
     }
 
     @Override
     public boolean handleClick(int mouseX, int mouseY, int button) {
         boolean result = super.handleClick(mouseX, mouseY, button);
-        this.isMouseOverHistory = this.getAdvancedGrid().getHistoryRect().contains(mouseX, mouseY);
+        this.isMouseOverHistory = this.getAdvancedGrid()
+            .getHistoryRect()
+            .contains(mouseX, mouseY);
         return result;
     }
 
     @Override
     public void mouseDragged(int mouseX, int mouseY, int button, long heldTime) {
-        if (mouseDownSlot >= 0 && draggedStack == null && NEIClientUtils.getHeldItem() == null &&
-                NEIClientConfig.hasSMPCounterPart() && !GuiInfo.hasCustomSlots(NEIClientUtils.getGuiContainer())) {
+        if (mouseDownSlot >= 0 && draggedStack == null
+            && NEIClientUtils.getHeldItem() == null
+            && NEIClientConfig.hasSMPCounterPart()
+            && !GuiInfo.hasCustomSlots(NEIClientUtils.getGuiContainer())) {
             ItemPanelSlot mouseOverSlot = getSlotMouseOver(mouseX, mouseY);
 
             if (mouseOverSlot == null || mouseOverSlot.slotIndex != mouseDownSlot || heldTime > 500) {
@@ -221,7 +377,8 @@ public class AdvancedItemPanel extends ItemPanel implements ICraftingHandler, IU
      * is over the history area in {@link AdvancedItemPanel#getDraggedStackWithQuantity(int)}
      */
     public ItemStack getDraggedStackWithQuantity(boolean isHistory, int mouseDownSlot) {
-        ItemStack stack = isHistory ? this.getAdvancedGrid().getHistoryItem(mouseDownSlot) : grid.getItem(mouseDownSlot);
+        ItemStack stack = isHistory ? this.getAdvancedGrid()
+            .getHistoryItem(mouseDownSlot) : grid.getItem(mouseDownSlot);
 
         if (stack != null) {
             int amount = NEIClientConfig.getItemQuantity();
@@ -239,158 +396,9 @@ public class AdvancedItemPanel extends ItemPanel implements ICraftingHandler, IU
     @Override
     protected ItemStack getDraggedStackWithQuantity(int mouseDownSlot) {
         Point mousePos = getMousePosition();
-        boolean isMouseOverHistoryItem = this.getAdvancedGrid().getHistoryRect().contains(mousePos.x, mousePos.y);
-        ItemStack stack = isMouseOverHistoryItem ? this.getAdvancedGrid().getHistoryItem(mouseDownSlot) : grid.getItem(mouseDownSlot);
-
-        if (stack != null) {
-            int amount = NEIClientConfig.getItemQuantity();
-
-            if (amount == 0) {
-                amount = stack.getMaxStackSize();
-            }
-
-            return NEIServerUtils.copyStack(stack, amount);
-        }
-
-        return null;
+        boolean isMouseOverHistoryItem = this.getAdvancedGrid()
+            .getHistoryRect()
+            .contains(mousePos.x, mousePos.y);
+        return getDraggedStackWithQuantity(isMouseOverHistoryItem, mouseDownSlot);
     }
-
-    @Override
-    public boolean mouseClicked(GuiContainer gui, int mouseX, int mouseY, int button) {
-        return this.getAdvancedGrid().getHistoryRect().contains(mouseX, mouseY);
-    }
-
-
-    @Override
-    public ICraftingHandler getRecipeHandler(String outputId, Object... results) {
-        this.addHistoryItem(results);
-        return this;
-    }
-
-    @Override
-    public IUsageHandler getUsageHandler(String inputId, Object... ingredients) {
-        this.addHistoryItem(ingredients);
-        return this;
-    }
-
-    @Override
-    public boolean keyTyped(GuiContainer gui, char keyChar, int keyCode) {
-        return false;
-    }
-
-    @Override
-    public void onKeyTyped(GuiContainer gui, char keyChar, int keyID) {
-
-    }
-
-    @Override
-    public boolean lastKeyTyped(GuiContainer gui, char keyChar, int keyID) {
-        return false;
-    }
-
-    @Override
-    public void onMouseClicked(GuiContainer gui, int mouseX, int mouseY, int button) {
-
-    }
-
-    @Override
-    public void onMouseUp(GuiContainer gui, int mouseX, int mouseY, int button) {
-
-    }
-
-    @Override
-    public boolean mouseScrolled(GuiContainer gui, int mouseX, int mouseY, int scrolled) {
-        return false;
-    }
-
-    @Override
-    public void onMouseScrolled(GuiContainer gui, int mouseX, int mouseY, int scrolled) {
-
-    }
-
-    @Override
-    public void onMouseDragged(GuiContainer gui, int mouseX, int mouseY, int button, long heldTime) {
-
-    }
-
-    @Override
-    public String getRecipeName() {
-        return null;
-    }
-
-    @Override
-    public int numRecipes() {
-        return 0;
-    }
-
-    @Override
-    public void drawBackground(int recipe) {
-
-    }
-
-    @Override
-    public void drawForeground(int recipe) {
-
-    }
-
-    @Override
-    public List<PositionedStack> getIngredientStacks(int recipe) {
-        return null;
-    }
-
-    @Override
-    public List<PositionedStack> getOtherStacks(int recipeType) {
-        return null;
-    }
-
-    @Override
-    public PositionedStack getResultStack(int recipe) {
-        return null;
-    }
-
-    @Override
-    public void onUpdate() {
-
-    }
-
-    @Override
-    public boolean hasOverlay(GuiContainer gui, Container container, int recipe) {
-        return false;
-    }
-
-    @Override
-    public IRecipeOverlayRenderer getOverlayRenderer(GuiContainer gui, int recipe) {
-        return null;
-    }
-
-    @Override
-    public IOverlayHandler getOverlayHandler(GuiContainer gui, int recipe) {
-        return null;
-    }
-
-    @Override
-    public int recipiesPerPage() {
-        return 0;
-    }
-
-    @Override
-    public List<String> handleTooltip(GuiRecipe<?> gui, List<String> currenttip, int recipe) {
-        return null;
-    }
-
-    @Override
-    public List<String> handleItemTooltip(GuiRecipe<?> gui, ItemStack stack, List<String> currenttip, int recipe) {
-        return null;
-    }
-
-    @Override
-    public boolean keyTyped(GuiRecipe gui, char keyChar, int keyCode, int recipe) {
-        return false;
-    }
-
-    @Override
-    public boolean mouseClicked(GuiRecipe gui, int button, int recipe) {
-        return true;
-    }
-
 }
