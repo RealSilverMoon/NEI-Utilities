@@ -1,8 +1,8 @@
 package com.github.vfyjxf.neiutilities.config;
 
-import net.minecraftforge.common.config.Configuration;
-
 import java.io.File;
+
+import net.minecraftforge.common.config.Configuration;
 
 public class NeiUtilitiesConfig {
 
@@ -18,23 +18,19 @@ public class NeiUtilitiesConfig {
         config = new Configuration(configFile);
         config.load();
         {
-            historyColor = Integer.parseUnsignedInt(config.getString(
-                    "historyColor",
-                    CATEGORY_HISTORY,
-                    "ee555555",
-                    "Color of the history area display"), 16);
+            historyColor = Integer.parseUnsignedInt(
+                config.getString("historyColor", CATEGORY_HISTORY, "ee555555", "Color of the history area display"),
+                16);
             useRows = config.getInt("useRows", "rows", 2, 1, 5, "Rows used in historical areas");
             try {
                 splittingMode = SplittingMode.valueOf(
-                        config.getString("splittingMode",
-                                CATEGORY_HISTORY,
-                                SplittingMode.DOTTED_LINE.name(),
-                                "Splitting mode for the browsing history.\n" +
-                                        "Mode : BACKGROUND,DOTTED_LINE"
-                        )
-                );
+                    config.getString(
+                        "splittingMode",
+                        CATEGORY_HISTORY,
+                        SplittingMode.DOTTED_LINE.name(),
+                        "Splitting mode for the browsing history.\n" + "Mode : BACKGROUND,DOTTED_LINE"));
             } catch (IllegalArgumentException | NullPointerException e) {
-                //set default mode
+                // set default mode
                 splittingMode = SplittingMode.BACKGROUND;
             }
         }
