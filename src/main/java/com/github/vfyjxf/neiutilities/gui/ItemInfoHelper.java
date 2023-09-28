@@ -1,16 +1,18 @@
 package com.github.vfyjxf.neiutilities.gui;
 
-import codechicken.nei.guihook.GuiContainerManager;
-import codechicken.nei.guihook.IContainerInputHandler;
-import com.github.vfyjxf.neiutilities.nei.NEIConfig;
-import net.minecraft.client.gui.inventory.GuiContainer;
-import net.minecraft.item.ItemStack;
-import net.minecraftforge.oredict.OreDictionary;
+import static codechicken.nei.NEIClientConfig.getKeyBinding;
 
 import java.awt.*;
 import java.awt.datatransfer.StringSelection;
 
-import static codechicken.nei.NEIClientConfig.getKeyBinding;
+import net.minecraft.client.gui.inventory.GuiContainer;
+import net.minecraft.item.ItemStack;
+import net.minecraftforge.oredict.OreDictionary;
+
+import com.github.vfyjxf.neiutilities.nei.NEIConfig;
+
+import codechicken.nei.guihook.GuiContainerManager;
+import codechicken.nei.guihook.IContainerInputHandler;
 
 public class ItemInfoHelper implements IContainerInputHandler {
 
@@ -21,19 +23,24 @@ public class ItemInfoHelper implements IContainerInputHandler {
                 ItemStack stackUnderMouse = GuiContainerManager.getStackMouseOver(gui);
                 if (stackUnderMouse != null) {
                     if (keyId == getKeyBinding(NEIConfig.COPY_NAME_KEY)) {
-                        Toolkit.getDefaultToolkit().getSystemClipboard().setContents(new StringSelection(stackUnderMouse.getDisplayName()), null);
+                        Toolkit.getDefaultToolkit()
+                            .getSystemClipboard()
+                            .setContents(new StringSelection(stackUnderMouse.getDisplayName()), null);
                     } else {
                         StringBuilder builder = new StringBuilder();
                         for (int id : OreDictionary.getOreIDs(stackUnderMouse)) {
                             String oreDictionaryName = OreDictionary.getOreName(id);
                             if (!"Unknown".equals(oreDictionaryName)) {
-                                builder.append(oreDictionaryName).append(",");
+                                builder.append(oreDictionaryName)
+                                    .append(",");
                             }
                         }
                         if (builder.length() > 0) {
                             builder.deleteCharAt(builder.length() - 1);
                         }
-                        Toolkit.getDefaultToolkit().getSystemClipboard().setContents(new StringSelection(builder.toString()), null);
+                        Toolkit.getDefaultToolkit()
+                            .getSystemClipboard()
+                            .setContents(new StringSelection(builder.toString()), null);
                     }
                     return true;
                 }
@@ -41,7 +48,6 @@ public class ItemInfoHelper implements IContainerInputHandler {
         }
         return false;
     }
-
 
     @Override
     public boolean keyTyped(GuiContainer gui, char keyChar, int keyCode) {

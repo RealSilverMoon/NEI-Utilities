@@ -1,5 +1,21 @@
 package com.github.vfyjxf.neiutilities.nei;
 
+import static codechicken.lib.gui.GuiDraw.getMousePosition;
+import static com.github.vfyjxf.neiutilities.config.NeiUtilitiesConfig.useRows;
+
+import java.awt.*;
+import java.util.ArrayList;
+import java.util.List;
+
+import net.minecraft.client.gui.inventory.GuiContainer;
+import net.minecraft.inventory.Container;
+import net.minecraft.item.ItemStack;
+
+import org.lwjgl.opengl.GL11;
+
+import com.github.vfyjxf.neiutilities.config.NeiUtilitiesConfig;
+import com.github.vfyjxf.neiutilities.config.SplittingMode;
+
 import codechicken.lib.gui.GuiDraw;
 import codechicken.lib.vec.Rectangle4i;
 import codechicken.nei.*;
@@ -10,19 +26,6 @@ import codechicken.nei.api.IRecipeOverlayRenderer;
 import codechicken.nei.guihook.GuiContainerManager;
 import codechicken.nei.guihook.IContainerInputHandler;
 import codechicken.nei.recipe.*;
-import com.github.vfyjxf.neiutilities.config.NeiUtilitiesConfig;
-import com.github.vfyjxf.neiutilities.config.SplittingMode;
-import net.minecraft.client.gui.inventory.GuiContainer;
-import net.minecraft.inventory.Container;
-import net.minecraft.item.ItemStack;
-import org.lwjgl.opengl.GL11;
-
-import java.awt.*;
-import java.util.ArrayList;
-import java.util.List;
-
-import static codechicken.lib.gui.GuiDraw.getMousePosition;
-import static com.github.vfyjxf.neiutilities.config.NeiUtilitiesConfig.useRows;
 
 public class AdvancedItemPanel extends ItemPanel implements ICraftingHandler, IUsageHandler, IContainerInputHandler {
 
@@ -36,7 +39,8 @@ public class AdvancedItemPanel extends ItemPanel implements ICraftingHandler, IU
 
     public void addHistoryItem(Object... results) {
         if (results.length > 0 && results[0] instanceof ItemStack) {
-            this.getAdvancedGrid().addHistoryItem((ItemStack) results[0]);
+            this.getAdvancedGrid()
+                .addHistoryItem((ItemStack) results[0]);
         }
     }
 
@@ -62,7 +66,7 @@ public class AdvancedItemPanel extends ItemPanel implements ICraftingHandler, IU
                 rect.h = rect.h * useRows;
                 return rect;
             } else {
-                //Some guis are too big so there is no place to display the history
+                // Some guis are too big so there is no place to display the history
                 return new Rectangle4i(0, 0, 0, 0);
             }
 
@@ -136,19 +140,29 @@ public class AdvancedItemPanel extends ItemPanel implements ICraftingHandler, IU
         public void draw(int mouseX, int mouseY) {
             super.draw(mouseX, mouseY);
             GuiContainerManager.enableMatrixStackLogging();
-            //draw history highlighted area
+            // draw history highlighted area
             Rectangle4i firstRect = getSlotRect(this.startIndex);
             if (NeiUtilitiesConfig.getSplittingMode() == SplittingMode.BACKGROUND) {
-                GuiDraw.drawRect(firstRect.x, firstRect.y, this.columns * firstRect.w, useRows * firstRect.h, NeiUtilitiesConfig.historyColor);
+                GuiDraw.drawRect(
+                    firstRect.x,
+                    firstRect.y,
+                    this.columns * firstRect.w,
+                    useRows * firstRect.h,
+                    NeiUtilitiesConfig.historyColor);
             } else {
-                drawSplittingArea(firstRect.x, firstRect.y, this.columns * firstRect.w, useRows * firstRect.h, NeiUtilitiesConfig.historyColor);
+                drawSplittingArea(
+                    firstRect.x,
+                    firstRect.y,
+                    this.columns * firstRect.w,
+                    useRows * firstRect.h,
+                    NeiUtilitiesConfig.historyColor);
             }
             for (int i = 0; i < this.validSlotMap.length && i < historyItems.size(); i++) {
                 if (validSlotMap[i]) {
                     Rectangle4i rect = getSlotRect(startIndex + i);
                     ItemPanelSlot slot = getSlotMouseOver(mouseX, mouseY);
                     if (slot != null && slot.slotIndex == startIndex + i) {
-                        GuiDraw.drawRect(rect.x, rect.y, rect.w, rect.h, 0xee555555);//highlight
+                        GuiDraw.drawRect(rect.x, rect.y, rect.w, rect.h, 0xee555555);// highlight
                     }
                     GuiContainerManager.drawItem(rect.x + 1, rect.y + 1, historyItems.get(i));
                 }
@@ -157,7 +171,6 @@ public class AdvancedItemPanel extends ItemPanel implements ICraftingHandler, IU
         }
 
         private void drawSplittingArea(int x, int y, int width, int height, int color) {
-
 
             float alpha = (float) (color >> 24 & 255) / 255.0F;
             float red = (float) (color >> 16 & 255) / 255.0F;
@@ -196,14 +209,18 @@ public class AdvancedItemPanel extends ItemPanel implements ICraftingHandler, IU
     @Override
     public boolean handleClick(int mouseX, int mouseY, int button) {
         boolean result = super.handleClick(mouseX, mouseY, button);
-        this.isMouseOverHistory = this.getAdvancedGrid().getHistoryRect().contains(mouseX, mouseY);
+        this.isMouseOverHistory = this.getAdvancedGrid()
+            .getHistoryRect()
+            .contains(mouseX, mouseY);
         return result;
     }
 
     @Override
     public void mouseDragged(int mouseX, int mouseY, int button, long heldTime) {
-        if (mouseDownSlot >= 0 && draggedStack == null && NEIClientUtils.getHeldItem() == null &&
-                NEIClientConfig.hasSMPCounterPart() && !GuiInfo.hasCustomSlots(NEIClientUtils.getGuiContainer())) {
+        if (mouseDownSlot >= 0 && draggedStack == null
+            && NEIClientUtils.getHeldItem() == null
+            && NEIClientConfig.hasSMPCounterPart()
+            && !GuiInfo.hasCustomSlots(NEIClientUtils.getGuiContainer())) {
             ItemPanelSlot mouseOverSlot = getSlotMouseOver(mouseX, mouseY);
 
             if (mouseOverSlot == null || mouseOverSlot.slotIndex != mouseDownSlot || heldTime > 500) {
@@ -221,7 +238,8 @@ public class AdvancedItemPanel extends ItemPanel implements ICraftingHandler, IU
      * is over the history area in {@link AdvancedItemPanel#getDraggedStackWithQuantity(int)}
      */
     public ItemStack getDraggedStackWithQuantity(boolean isHistory, int mouseDownSlot) {
-        ItemStack stack = isHistory ? this.getAdvancedGrid().getHistoryItem(mouseDownSlot) : grid.getItem(mouseDownSlot);
+        ItemStack stack = isHistory ? this.getAdvancedGrid()
+            .getHistoryItem(mouseDownSlot) : grid.getItem(mouseDownSlot);
 
         if (stack != null) {
             int amount = NEIClientConfig.getItemQuantity();
@@ -239,8 +257,11 @@ public class AdvancedItemPanel extends ItemPanel implements ICraftingHandler, IU
     @Override
     protected ItemStack getDraggedStackWithQuantity(int mouseDownSlot) {
         Point mousePos = getMousePosition();
-        boolean isMouseOverHistoryItem = this.getAdvancedGrid().getHistoryRect().contains(mousePos.x, mousePos.y);
-        ItemStack stack = isMouseOverHistoryItem ? this.getAdvancedGrid().getHistoryItem(mouseDownSlot) : grid.getItem(mouseDownSlot);
+        boolean isMouseOverHistoryItem = this.getAdvancedGrid()
+            .getHistoryRect()
+            .contains(mousePos.x, mousePos.y);
+        ItemStack stack = isMouseOverHistoryItem ? this.getAdvancedGrid()
+            .getHistoryItem(mouseDownSlot) : grid.getItem(mouseDownSlot);
 
         if (stack != null) {
             int amount = NEIClientConfig.getItemQuantity();
@@ -257,9 +278,10 @@ public class AdvancedItemPanel extends ItemPanel implements ICraftingHandler, IU
 
     @Override
     public boolean mouseClicked(GuiContainer gui, int mouseX, int mouseY, int button) {
-        return this.getAdvancedGrid().getHistoryRect().contains(mouseX, mouseY);
+        return this.getAdvancedGrid()
+            .getHistoryRect()
+            .contains(mouseX, mouseY);
     }
-
 
     @Override
     public ICraftingHandler getRecipeHandler(String outputId, Object... results) {

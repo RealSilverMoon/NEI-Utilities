@@ -1,14 +1,14 @@
 [{
-  "modid": "${mod_id}",
-  "name": "${mod_name}",
-  "description": "${mod_description}",
-  "version": "${mod_version}",
-  "mcversion": "${mc_version}",
+  "modid": "${modId}",
+  "name": "${modName}",
+  "description": "",
+  "version": "0.1.8",
+  "mcversion": "1.7.10",
   "url": "",
   "updateUrl": "",
-  "authorList": ["${mod_author}"],
-  "credits": "",
-  "logoFile": "${mod_icon}",
+  "authorList": ["vfyjxf_"],
+  "credits": "Thanks for the idea from NEI easy search",
+  "logoFile": "logo.png",
   "screenshots": [],
   "dependencies": []
 }]
