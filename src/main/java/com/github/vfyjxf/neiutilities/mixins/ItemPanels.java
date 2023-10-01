@@ -8,6 +8,6 @@ import codechicken.nei.ItemPanel;
 @Mixin(value = codechicken.nei.ItemPanels.class)
 public interface ItemPanels {
 
-    @Accessor
+    @Accessor(remap = false)
     public static void setItemPanel(ItemPanel itemPanel) {}
 }
