@@ -3,6 +3,7 @@ package com.github.vfyjxf.neiutilities.nei;
 import org.lwjgl.input.Keyboard;
 
 import com.github.vfyjxf.neiutilities.NEIUtilities;
+import com.github.vfyjxf.neiutilities.Tags;
 import com.github.vfyjxf.neiutilities.gui.ItemInfoHelper;
 import com.github.vfyjxf.neiutilities.mixins.ItemPanels;
 
@@ -44,6 +45,6 @@ public class NEIConfig implements IConfigureNEI {
 
     @Override
     public String getVersion() {
-        return NEIUtilities.VERSION;
+        return Tags.VERSION;
     }
 }
