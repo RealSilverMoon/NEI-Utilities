@@ -2,7 +2,7 @@ package com.github.vfyjxf.neiutilities.gui;
 
 import static codechicken.nei.NEIClientConfig.getKeyBinding;
 
-import java.awt.*;
+import java.awt.Toolkit;
 import java.awt.datatransfer.StringSelection;
 
 import net.minecraft.client.gui.inventory.GuiContainer;

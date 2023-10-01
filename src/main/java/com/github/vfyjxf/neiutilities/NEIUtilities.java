@@ -19,14 +19,13 @@ import cpw.mods.fml.relauncher.SideOnly;
 
 @Mod(
     modid = NEIUtilities.MODID,
-    version = NEIUtilities.VERSION,
+    version = Tags.VERSION,
     name = NEIUtilities.NAME,
     dependencies = NEIUtilities.DEPENDENCIES)
 public class NEIUtilities {
 
     public static final String MODID = "neiutilities";
     public static final String NAME = "NEI Utilities";
-    public static final String VERSION = "@VERSION@";
     public static final String DEPENDENCIES = "required-after:NotEnoughItems";
 
     public static final Logger logger = LogManager.getLogger(NEIUtilities.NAME);
