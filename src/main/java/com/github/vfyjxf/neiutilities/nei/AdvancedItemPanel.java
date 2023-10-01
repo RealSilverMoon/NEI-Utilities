@@ -3,7 +3,7 @@ package com.github.vfyjxf.neiutilities.nei;
 import static codechicken.lib.gui.GuiDraw.getMousePosition;
 import static com.github.vfyjxf.neiutilities.config.NeiUtilitiesConfig.useRows;
 
-import java.awt.*;
+import java.awt.Point;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,14 +18,20 @@ import com.github.vfyjxf.neiutilities.config.SplittingMode;
 
 import codechicken.lib.gui.GuiDraw;
 import codechicken.lib.vec.Rectangle4i;
-import codechicken.nei.*;
+import codechicken.nei.ItemPanel;
+import codechicken.nei.NEIClientConfig;
+import codechicken.nei.NEIClientUtils;
+import codechicken.nei.NEIServerUtils;
+import codechicken.nei.PositionedStack;
 import codechicken.nei.api.GuiInfo;
 import codechicken.nei.api.INEIGuiHandler;
 import codechicken.nei.api.IOverlayHandler;
 import codechicken.nei.api.IRecipeOverlayRenderer;
 import codechicken.nei.guihook.GuiContainerManager;
 import codechicken.nei.guihook.IContainerInputHandler;
-import codechicken.nei.recipe.*;
+import codechicken.nei.recipe.GuiRecipe;
+import codechicken.nei.recipe.ICraftingHandler;
+import codechicken.nei.recipe.IUsageHandler;
 
 public class AdvancedItemPanel extends ItemPanel implements ICraftingHandler, IUsageHandler, IContainerInputHandler {
 
