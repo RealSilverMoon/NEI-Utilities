@@ -77,7 +77,18 @@ public class AdvancedItemPanel extends ItemPanel implements ICraftingHandler, IU
             }
 
         }
+        @Override
+        public boolean contains(int px, int py) {
+            if (!(new Rectangle4i(marginLeft + paddingLeft, marginTop, columns * SLOT_SIZE, height)).contains(px, py)) {
+                return false;
+            }
 
+            final int r = (py - marginTop) / SLOT_SIZE;
+            final int c = (px - marginLeft - paddingLeft) / SLOT_SIZE;
+            final int slt = columns * r + c;
+
+            return r >= rows || c >= columns || !isInvalidSlot(slt);
+        }
         @Override
         public void setGridSize(int mLeft, int mTop, int w, int h) {
             super.setGridSize(mLeft, mTop, w, h);
